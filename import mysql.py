@@ -4,7 +4,7 @@ from mysql.connector import Error
 # --- KONFIGURACE DATABÁZE ---
 DB_CONFIG = {
     'host': 'localhost',  # Změňte, pokud je MySQL server jinde
-    'database': 'Project 5',
+    'database': 'Project_5',
     'user': 'root',       # Změňte na vaše uživatelské jméno
     'password': '11111111' # Změňte na vaše heslo
 }
