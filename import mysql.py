@@ -6,7 +6,7 @@ DB_CONFIG = {
     'host': 'localhost',  # Změňte, pokud je MySQL server jinde
     'database': 'Project_5',
     'user': 'root',       # Změňte na vaše uživatelské jméno
-    'password': '11111111' # Změňte na vaše heslo
+    'password': '2020' # Změňte na vaše heslo
 }
 
 def create_db_connection():
