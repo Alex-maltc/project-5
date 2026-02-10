@@ -24,7 +24,14 @@ def setup_database(conn):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-       except Error as e:
+            CREATE TABLE IF NOT EXISTS ukoly (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nazev VARCHAR(255) NOT NULL,
+                popis TEXT
+            );
+        """)
+        conn.commit()
+    except Error as e:
         print(f"Chyba při vytváření tabulky: {e}")
     finally:
         cursor.close()
@@ -218,11 +225,5 @@ def main():
 
 # Spuštění programu
 if __name__ == "__main__":
-    main()      CREATE TABLE IF NOT EXISTS ukoly (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nazev VARCHAR(255) NOT NULL,
-                popis TEXT
-            );
-        """)
-        conn.commit()
+ main()   
    
