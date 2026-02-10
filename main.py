@@ -6,8 +6,9 @@ DB_CONFIG = {
     'host': '127.0.0.1',  
     'database': 'Project_5',
     'user': 'root',      
-    'password': '2020' 
+    'password': '2020'  # Ujisti se, že toto heslo je správné!
 }
+
 def create_db_connection():
     """Vytvoří a vrátí spojení k databázi."""
     try:
@@ -17,20 +18,9 @@ def create_db_connection():
     except Error as e:
         print(f"Chyba při připojování k MySQL: {e}")
         return None
-    
-def main():
-    conn = create_db_connection()
-    if not conn: return
-    
-    # Ověříme, zda už máme tabulku připravenou
-    if existuje_tabulka(conn, "ukoly"):
-        print("Tabulka 'ukoly' nalezena, můžeme pracovat.")
-    else:
-        print("Tabulka nenalezena, spouštím instalaci...")
-        setup_database(conn)
 
 def setup_database(conn):
-    """Vytvoří tabulku 'ukoly' s rozšířenými sloupci a NOT NULL omezením."""
+    """Vytvoří tabulku 'ukoly', pokud ještě neexistuje."""
     cursor = conn.cursor()
     try:
         cursor.execute("""
@@ -43,7 +33,7 @@ def setup_database(conn):
             );
         """)
         conn.commit()
-        print("Tabulka 'ukoly' je připravena (včetně NOT NULL pro popis).")
+        # print("Tabulka 'ukoly' je připravena.") # Odkomentuj, pokud chceš vidět potvrzení při každém startu
     except Error as e:
         print(f"Chyba při vytváření tabulky: {e}")
     finally:
@@ -65,7 +55,7 @@ def pridat_ukol(conn):
         popis = input("Popis: ").strip()
         if popis:
             break
-        print("Chyba: Popis je povinný (nastaveno NOT NULL)!")
+        print("Chyba: Popis je povinný!")
     
     print("Vyberte stav: 1. nezahájeno (default), 2. probíhá, 3. hotovo")
     volba_stavu = input("Volba (1-3): ")
@@ -135,6 +125,8 @@ def aktualizovat_ukol(conn):
         cursor.execute(query, tuple(params))
         conn.commit()
         print("Úkol byl úspěšně aktualizován.")
+    except ValueError:
+        print("Chyba: Zadáno neplatné ID.")
     except Exception as e:
         print(f"Došlo k chybě: {e}")
 
@@ -149,12 +141,17 @@ def odstranit_ukol(conn):
             print(f"Úkol s ID {u_id} byl smazán.")
         else:
             print("Úkol s tímto ID nebyl nalezen.")
+    except Error as e:
+         print(f"Chyba DB: {e}")
     finally:
         cursor.close()
 
 def main():
     conn = create_db_connection()
     if not conn: return
+    
+    # Setup database se postará o vytvoření tabulky, pokud neexistuje
+    # Není potřeba to ověřovat ručně funkcí existuje_tabulka
     setup_database(conn)
 
     while True:
