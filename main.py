@@ -74,24 +74,39 @@ def pridat_ukol(conn):
         cursor.close()
 
 def zobrazit_ukoly(conn):
-    """Načte a přehledně zobrazí všechny úkoly."""
+    """
+    Zobrazí pouze aktivní úkoly (Nezahájeno nebo Probíhá).
+    Hotové úkoly jsou skryty.
+    """
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT id, nazev, popis, stav, datum_vytvoreni FROM ukoly")
+        # SQL dotaz s filtrem: vybíráme jen to, co NENÍ hotové
+        query = """
+            SELECT id, nazev, popis, stav, datum_vytvoreni 
+            FROM ukoly 
+            WHERE stav IN ('nezahájeno', 'probíhá') 
+            ORDER BY id
+        """
+        cursor.execute(query)
         ukoly = cursor.fetchall()
 
-        print(f"\n{'ID':<3} | {'NÁZEV':<15} | {'STAV':<12} | {'VYTVOŘENO':<19}")
-        print("-" * 65)
+        print(f"\n{'ID':<3} | {'NÁZEV':<15} | {'STAV':<12} | {'POPIS (zkrácený)':<25}")
+        print("-" * 70)
         
         if not ukoly:
-            print("Seznam úkolů je prázdný.")
+            print("Vše je hotovo! Seznam aktivních úkolů je prázdný.")
         else:
             for u_id, nazev, popis, stav, datum in ukoly:
-                cas = datum.strftime("%d.%m.%Y %H:%M")
-                print(f"{u_id:<3} | {nazev:<15} | {stav:<12} | {cas}")
+                # Pokud je popis moc dlouhý, zkrátíme ho pro hezčí výpis
+                kratky_popis = (popis[:22] + '..') if len(popis) > 22 else popis
+                
+                print(f"{u_id:<3} | {nazev:<15} | {stav:<12} | {kratky_popis:<25}")
+        
         return ukoly
+
     except Error as e:
-        print(f"Chyba při načítání: {e}")
+        print(f"Chyba při načítání úkolů: {e}")
+        return []
     finally:
         cursor.close()
 
