@@ -3,9 +3,9 @@ from mysql.connector import Error
 
 # --- KONFIGURACE DATABÁZE ---
 DB_CONFIG = {
-    'host': 'localhost',  # Změňte, pokud je MySQL server jinde
+    'host': '127.0.0.1',  # Změňte, pokud je MySQL server jinde
     'database': 'Project_5',
-    'user': 'root',       # Změňte na vaše uživatelské jméno
+    'user': 'root',      # Změňte na vaše uživatelské jméno
     'password': '2020' # Změňte na vaše heslo
 }
 
@@ -41,16 +41,13 @@ def hlavni_menu():
     print("\n--- Správce úkolů - Hlavní menu ---")
     print("1. Přidat nový úkol")
     print("2. Zobrazit všechny úkoly")
-    print("3. Aktualizovat úkol")     # NOVÁ VOLBA
+    print("3. Aktualizovat úkol")
     print("4. Odstranit úkol")
-    print("5. Konec programu")         # Konec je nyní volba 5
+    print("5. Konec programu")
     
     volba = input("Vyberte možnost (1-5): ")
     return volba
 
-# ------------------------------
-# ZŮSTÁVÁ STEJNÉ
-# ------------------------------
 def pridat_ukol(conn):
     """Vloží nový úkol do tabulky ukoly."""
     nazev = input("Zadejte název úkolu: ")
@@ -78,12 +75,13 @@ def zobrazit_ukoly(conn):
         cursor.execute(query)
         ukoly = cursor.fetchall()
 
-        print("\nSeznam úkolů:")
+        print("\n--- Seznam úkolů ---")
         if not ukoly:
             print("Seznam úkolů je prázdný.")
         else:
-            for id, nazev, popis in ukoly:
-                print(f"{id}. {nazev} - {popis}")
+            # OPRAVENO: Správné rozbalení ID, nazev, popis
+            for ukol_id, nazev, popis in ukoly:
+                print(f"ID {ukol_id}: {nazev} - {popis}")
     except Error as e:
         print(f"Chyba při načítání úkolů: {e}")
     finally:
@@ -91,9 +89,7 @@ def zobrazit_ukoly(conn):
     
     return ukoly
     
-# ------------------------------
 # 3. NOVÁ FUNKCE AKTUALIZOVAT ÚKOL
-# ------------------------------
 def aktualizovat_ukol(conn):
     """Umožní uživateli aktualizovat název a popis úkolu podle ID."""
     
@@ -150,9 +146,7 @@ def aktualizovat_ukol(conn):
         if 'cursor' in locals() and cursor:
             cursor.close()
 
-# ------------------------------
 # 4. FUNKCE ODSTRANIT ÚKOL
-# ------------------------------
 def odstranit_ukol(conn):
     """Odstraní úkol podle ID zadaného uživatelem."""
     
@@ -211,7 +205,7 @@ def main():
             input("\nStiskněte Enter pro návrat do menu...")
             
         elif volba == '3':
-            aktualizovat_ukol(conn)  # Nová implementace volaná na volbě 3
+            aktualizovat_ukol(conn)
             input("\nStiskněte Enter pro návrat do menu...")
 
         elif volba == '4':
