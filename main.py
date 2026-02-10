@@ -6,7 +6,7 @@ DB_CONFIG = {
     'host': '127.0.0.1',  
     'database': 'Project_5',
     'user': 'root',      
-    'password': '2020'  # Ujisti se, že toto heslo je správné!
+    'password': '2020'  
 }
 
 def create_db_connection():
@@ -80,7 +80,7 @@ def zobrazit_ukoly(conn):
     """
     cursor = conn.cursor()
     try:
-        # SQL dotaz s filtrem: vybíráme jen to, co NENÍ hotové
+        # SQL dotaz s filtrem: vybíráme jen to, co není hotové
         query = """
             SELECT id, nazev, popis, stav, datum_vytvoreni 
             FROM ukoly 
@@ -94,7 +94,7 @@ def zobrazit_ukoly(conn):
         print("-" * 70)
         
         if not ukoly:
-            print("Vše je hotovo! Seznam aktivních úkolů je prázdný.")
+            print("Seznam aktivních úkolů je prázdný.")
         else:
             for u_id, nazev, popis, stav, datum in ukoly:
                 # Pokud je popis moc dlouhý, zkrátíme ho pro hezčí výpis
@@ -165,7 +165,7 @@ def main():
     conn = create_db_connection()
     if not conn: return
     
-    # Setup database se postará o vytvoření tabulky, pokud neexistuje
+    # Setup database se stará o vytvoření tabulky, pokud neexistuje
     # Není potřeba to ověřovat ručně funkcí existuje_tabulka
     setup_database(conn)
 
