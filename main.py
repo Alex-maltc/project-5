@@ -17,6 +17,17 @@ def create_db_connection():
     except Error as e:
         print(f"Chyba při připojování k MySQL: {e}")
         return None
+    
+def main():
+    conn = create_db_connection()
+    if not conn: return
+    
+    # Ověříme, zda už máme tabulku připravenou
+    if existuje_tabulka(conn, "ukoly"):
+        print("Tabulka 'ukoly' nalezena, můžeme pracovat.")
+    else:
+        print("Tabulka nenalezena, spouštím instalaci...")
+        setup_database(conn)
 
 def setup_database(conn):
     """Vytvoří tabulku 'ukoly' s rozšířenými sloupci a NOT NULL omezením."""
@@ -49,7 +60,7 @@ def pridat_ukol(conn):
             break
         print("Chyba: Název je povinný!")
 
-    # Validace: Popis nesmí být prázdný (protože máme v DB NOT NULL)
+    # Validace: Popis nesmí být prázdný
     while True:
         popis = input("Popis: ").strip()
         if popis:
