@@ -24,14 +24,7 @@ def setup_database(conn):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS ukoly (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nazev VARCHAR(255) NOT NULL,
-                popis TEXT
-            );
-        """)
-        conn.commit()
-    except Error as e:
+       except Error as e:
         print(f"Chyba při vytváření tabulky: {e}")
     finally:
         cursor.close()
@@ -79,7 +72,7 @@ def zobrazit_ukoly(conn):
         if not ukoly:
             print("Seznam úkolů je prázdný.")
         else:
-            # OPRAVENO: Správné rozbalení ID, nazev, popis
+            # Správné rozbalení ID, nazev, popis
             for ukol_id, nazev, popis in ukoly:
                 print(f"ID {ukol_id}: {nazev} - {popis}")
     except Error as e:
@@ -89,7 +82,7 @@ def zobrazit_ukoly(conn):
     
     return ukoly
     
-# 3. NOVÁ FUNKCE AKTUALIZOVAT ÚKOL
+# 3. FUNKCE AKTUALIZOVAT ÚKOL
 def aktualizovat_ukol(conn):
     """Umožní uživateli aktualizovat název a popis úkolu podle ID."""
     
@@ -182,7 +175,7 @@ def odstranit_ukol(conn):
 # HLAVNÍ FUNKCE PROGRAMU
 # ------------------------------
 def main():
-    """Hlavní funkce řídící běh programu."""
+    """Hlavní funkce programu."""
     
     conn = create_db_connection()
     
@@ -225,4 +218,11 @@ def main():
 
 # Spuštění programu
 if __name__ == "__main__":
-    main()
+    main()      CREATE TABLE IF NOT EXISTS ukoly (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nazev VARCHAR(255) NOT NULL,
+                popis TEXT
+            );
+        """)
+        conn.commit()
+   
