@@ -166,20 +166,55 @@ def aktualizovat_ukol(conn):
             cursor.close()
 
 def odstranit_ukol(conn):
-    """Smaže úkol z databáze podle ID."""
-    u_id = input("\nZadejte ID úkolu, který chcete smazat: ")
-    cursor = conn.cursor()
-    try:
-        cursor.execute("DELETE FROM ukoly WHERE id = %s", (u_id,))
-        conn.commit()
-        if cursor.rowcount > 0:
-            print(f"Úkol s ID {u_id} byl smazán.")
-        else:
-            print("Úkol s tímto ID nebyl nalezen.")
-    except Error as e:
-         print(f"Chyba DB: {e}")
-    finally:
-        cursor.close()
+    """
+    Uživatel vidí seznam, vybere ID a po potvrzení je úkol smazán.
+    Při zadání špatného ID se dotaz opakuje.
+    """
+    while True:
+        # 1. Zobrazení seznamu úkolů (využíváme tvou existující funkci)
+        ukoly = zobrazit_ukoly(conn)
+        
+        if not ukoly:
+            print("Seznam je prázdný, není co odstranit.")
+            return
+
+        # 2. Výběr ID úkolu
+        id_vstup = input("\nZadejte ID úkolu, který chcete TRVALE SMAZAT (nebo 'q' pro zrušení): ").strip()
+        
+        if id_vstup.lower() == 'q':
+            print("Mazání zrušeno.")
+            return
+
+        # Ověření, zda ID existuje v aktuálně načteném seznamu
+        platna_id = [str(u[0]) for u in ukoly]
+        
+        if id_vstup not in platna_id:
+            print(f"Chyba: Úkol s ID {id_vstup} neexistuje. Vyberte prosím ID ze seznamu výše.")
+            continue # Zopakuje cyklus
+
+        # 3. Potvrzení smazání (bezpečnostní krok)
+        potvrzeni = input(f"Opravdu chcete úkol ID {id_vstup} trvale odstranit? (ano/ne): ").strip().lower()
+        
+        if potvrzeni != 'ano':
+            print("Mazání přerušeno.")
+            continue
+
+        # 4. Samotné odstranění z DB
+        cursor = conn.cursor()
+        try:
+            query = "DELETE FROM ukoly WHERE id = %s"
+            cursor.execute(query, (id_vstup,))
+            conn.commit()
+            
+            if cursor.rowcount > 0:
+                print(f"\nÚspěch: Úkol ID {id_vstup} byl trvale smazán z databáze.")
+            break # Vše proběhlo v pořádku, ukončíme funkci
+            
+        except Error as e:
+            print(f"Chyba při mazání z databáze: {e}")
+            break
+        finally:
+            cursor.close()
 
 def main():
     conn = create_db_connection()
