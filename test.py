@@ -3,7 +3,7 @@ from unittest.mock import patch
 import mysql.connector
 from main_test import DB_CONFIG, pridat_ukol, aktualizovat_ukol, odstranit_ukol, setup_database
 
-# Úprava konfigurace pro testovací DB
+# Úpravit konfigurace pro testovací DB
 TEST_DB_CONFIG = DB_CONFIG.copy()
 TEST_DB_CONFIG['database'] = 'Project_5_test' 
 
