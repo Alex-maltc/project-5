@@ -20,17 +20,20 @@ def create_db_connection():
         return None
 
 def setup_database(conn):
-    """Vytvoří tabulku 'ukoly', pokud neexistuje."""
+    """Vytvoří tabulku 'ukoly' s rozšířenými sloupci, pokud neexistuje."""
     cursor = conn.cursor()
     try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS ukoly (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 nazev VARCHAR(255) NOT NULL,
-                popis TEXT
+                popis TEXT,
+                stav ENUM('nezahájeno', 'probíhá', 'hotovo') DEFAULT 'nezahájeno',
+                datum_vytvoreni TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
         conn.commit()
+        print("Tabulka 'ukoly' je připravena.")
     except Error as e:
         print(f"Chyba při vytváření tabulky: {e}")
     finally:
