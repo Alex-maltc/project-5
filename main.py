@@ -27,7 +27,7 @@ def setup_database(conn):
             CREATE TABLE IF NOT EXISTS ukoly (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 nazev VARCHAR(255) NOT NULL,
-                popis TEXT,
+                popis TEXT NOT NULL,
                 stav ENUM('nezahájeno', 'probíhá', 'hotovo') DEFAULT 'nezahájeno',
                 datum_vytvoreni TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
