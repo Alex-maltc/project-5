@@ -111,39 +111,59 @@ def zobrazit_ukoly(conn):
         cursor.close()
 
 def aktualizovat_ukol(conn):
-    """Umožní aktualizaci polí úkolu."""
-    ukoly = zobrazit_ukoly(conn)
-    if not ukoly: return
-
-    try:
-        u_id = int(input("\nZadejte ID úkolu pro změnu: "))
-        novy_nazev = input("Nový název (Enter pro přeskočení): ").strip()
-        novy_popis = input("Nový popis (Enter pro přeskočení): ").strip()
-        print("Nový stav: 1. nezahájeno, 2. probíhá, 3. hotovo (Enter pro přeskočení)")
-        v_stav = input("Volba: ")
+    """
+    Změna stavu úkolu.
+    Uživatel vybere ID a následně nový stav (Probíhá/Hotovo).
+    """
+    while True:
+        # 1. Zobrazení aktuálních úkolů
+        ukoly = zobrazit_ukoly(conn)
         
-        stavy_map = {'1': 'nezahájeno', '2': 'probíhá', '3': 'hotovo'}
-        updates = []
-        params = []
+        if not ukoly:
+            print("Není co aktualizovat.")
+            return
 
-        if novy_nazev: updates.append("nazev = %s"); params.append(novy_nazev)
-        if novy_popis: updates.append("popis = %s"); params.append(novy_popis)
-        if v_stav in stavy_map: updates.append("stav = %s"); params.append(stavy_map[v_stav])
-
-        if not updates:
-            print("Nebyla provedena žádná změna."); return
-
-        query = f"UPDATE ukoly SET {', '.join(updates)} WHERE id = %s"
-        params.append(u_id)
+        # 2. Výběr ID úkolu
+        id_vstup = input("\nZadejte ID úkolu pro změnu stavu (nebo 'q' pro zrušení): ").strip()
         
+        if id_vstup.lower() == 'q':
+            return
+
+        # Ověření, zda ID existuje v aktuálním seznamu
+        platna_id = [str(u[0]) for u in ukoly] # Seznam ID z načtených úkolů
+        
+        if id_vstup not in platna_id:
+            print(f"Chyba: Úkol s ID {id_vstup} neexistuje v seznamu. Zkuste to znovu.")
+            continue 
+
+        # 3. Výběr nového stavu
+        print("\nVyberte nový stav:")
+        print("1. Probíhá")
+        print("2. Hotovo")
+        volba_stavu = input("Vaše volba (1-2): ").strip()
+
+        novy_stav = ""
+        if volba_stavu == '1':
+            novy_stav = "probíhá"
+        elif volba_stavu == '2':
+            novy_stav = "hotovo"
+        else:
+            print("Neplatná volba stavu. Aktualizace zrušena.")
+            continue
+
+        # 4. Aktualizace v databázi
         cursor = conn.cursor()
-        cursor.execute(query, tuple(params))
-        conn.commit()
-        print("Úkol byl úspěšně aktualizován.")
-    except ValueError:
-        print("Chyba: Zadáno neplatné ID.")
-    except Exception as e:
-        print(f"Došlo k chybě: {e}")
+        try:
+            query = "UPDATE ukoly SET stav = %s WHERE id = %s"
+            cursor.execute(query, (novy_stav, id_vstup))
+            conn.commit()
+            print(f"\nÚkol ID {id_vstup} byl úspěšně změněn na stav: '{novy_stav}'.")
+            break # Úspěšně hotovo, vyskočíme z cyklu ven
+        except Error as e:
+            print(f"Chyba při komunikaci s databází: {e}")
+            break
+        finally:
+            cursor.close()
 
 def odstranit_ukol(conn):
     """Smaže úkol z databáze podle ID."""
